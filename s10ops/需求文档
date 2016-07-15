@@ -1,0 +1,39 @@
+毕业项目 -自动化运维平台
+    主机管理
+        堡垒机
+            权限管理
+                特定的人可以访问特定的目标设备
+                    王三鑫 --》500台机器--》普通用户
+                    王三鑫 --》500（10）台机器--》root用户
+                    王三鑫 --》100台机器--》mysql用户
+
+                权限回收
+
+            用户行为审计
+                操作命令
+                文件上传下载
+                *图形界面操作
+
+        批量
+            命令
+            文件
+            任务计划
+
+    资产管理
+
+
+    监控
+
+L014-04 python s10 day14 一劳永逸定制用户认证系统
+1、创建一个项目，django的hosts，myauth.py
+2、settings配置AUTH_USER_MODEL = 'hosts.UserProfile'
+3、myauth.py
+4、models.py 导入 from myauth import UserProfile
+5、python manage.py migrate
+6、python manage.py makemigrations
+7、python manage.py createsuperuser
+8、auth_admin.py 是密码变密文，需导入admin.py
+
+
+>python manage.py makemigrations
+>python manage.py migrate

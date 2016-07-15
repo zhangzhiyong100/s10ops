@@ -1,0 +1,13 @@
+{% extends 'hosts/dashboard.html' %}
+
+{% block content-panel %}
+{% include 'hosts/host_list_component.html' %}
+
+{% include 'hosts/task_exec_component.html' %}
+
+{% endblock %}
+
+{% block bottom-js %}
+{% include "hosts/multi_task_js_component.html" %}
+
+{% endblock %}

@@ -1,0 +1,17 @@
+<div class="col-md-9">
+    <div class="panel panel-default panel-right">
+      <div class="panel-body">
+
+          <textarea name="cmd" class="form-control" rows="3" placeholder="输入要执行的命令..."></textarea>
+          <br/>
+          <button type="button" class="btn btn-success pull-right" onclick="SubmitTask('multi_cmd')">执行命令</button>
+            <!-- SubmitTask做判断，看是否有主机选中 -->
+          <div id="err-msgs"></div>
+
+          <hr/>
+          <div id="result-box">
+
+          </div>
+
+      </div>
+</div>

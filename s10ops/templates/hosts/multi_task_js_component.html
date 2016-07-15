@@ -1,0 +1,119 @@
+    <script type="text/javascript">
+     $(document).ready(function(){
+         $("#group-list a[data='group']").click(function(){
+             $(this).nextAll().toggleClass("hide");
+
+         });//end #group-list li[href='group']"，nextALL和它同级的下面所有
+
+     });//end doc ready
+
+
+    function CheckAllToggle(ele){
+
+       if(ele.checked){//把它下面所有的主机都 全选
+            $(ele).next().next().children().children("input").prop("checked",true);
+       }else{
+
+            $(ele).next().next().children().children("input").prop("checked",false);
+
+       }
+
+    }
+    function SubmitTask(task_type){
+
+            FormVerification(task_type);//form表单验证
+
+    }
+    function FormVerification(task_type){//确定主机是否选中的表单
+        var err_list = [];
+        var data_list = {};//存储所有的用户选择的主机和其他参数
+        var selected_host = VerifyHostSelection();
+        data_list['selected_hosts'] = selected_host;//判断是否选择主机的
+        data_list['task_type'] = task_type;
+
+        if (selected_host.length == 0){
+                err_list.push(['验证失败',"未选择任何主机!"])
+            }
+
+        if (task_type == 'multi_cmd'){
+
+            var cmd_text = $.trim($("textarea[name='cmd']").val());//$.trim 去空格
+            data_list['cmd'] = cmd_text;
+            if (cmd_text.length == 0){
+                err_list.push(['验证失败',"未输入要执行的命令!"])
+            }
+        }else if(task_type == 'multi_file_transfer'){//
+            var remote_path_val = $.trim($("#remote_file_path").val());
+            data_list['remote_path']=remote_path_val; //向data_list里存放上传的远程路径
+            if(remote_path_val.length ==0){
+                 err_list.push(['验证失败',"未输入远程文件路径!"])
+            }
+
+
+            //verify upload or download
+            var task_action = $("#task_type").val();
+            data_list['file_transfer_type'] = task_action;//向data_list里存放选择的动作
+                if(upload_files.length ==0){
+                    err_list.push(['验证失败',"还未上传任何文件到中转机!"])
+                }
+                data_list['upload_files']=upload_files;//向data_list里存放上传的文件
+            }
+
+
+
+        if (err_list.length>0) {//拼接html
+            $("#err-msgs").html(" ");
+            $.each(err_list, function (index, item) {
+                var err_msg = "<p style='color:red;'>" + index + ". " + item[1] + "</p>";
+                $("#err-msgs").append(err_msg);
+            })
+        }else{
+             $("#err-msgs").html(" ");
+            //提交任务，csrfmiddlewaretoken从页面获取
+            data_list["csrfmiddlewaretoken"] = $("input[name='csrfmiddlewaretoken']").val();
+            $.post("{% url 'submit_task' %}", data_list, function(callback){//post返回json格式
+                console.log(callback);
+                task_id_obj = JSON.parse(callback);//json反序列化
+                RefreshGetTaskResult(task_id_obj.task_id);//取到任务id，循环到数据库刷结果
+            });//end post
+
+        }
+    }
+    function VerifyHostSelection(){//确定主机是否选中
+        var selected_hosts = [];
+        var all_hosts =  $("input[data='bind-host']");
+        $.each(all_hosts, function(index,ele){
+            if(ele.checked){
+                selected_hosts.push($(ele).val());
+            }
+        });//end each
+      return selected_hosts;
+    }
+
+    function RefreshGetTaskResult(task_id){
+        GetTaskResult(task_id);
+        GetTaskResultInterval = setInterval(function(){
+          GetTaskResult(task_id);//去后台取结果
+        },3000);
+
+
+    }
+
+    function GetTaskResult(task_id){
+        $.getJSON("{% url 'get_task_result' %}",{task_id:task_id},function(callback){
+            console.log(callback);
+            PrintOnPage(callback);
+        //getJSON返回已经解析好的
+        })//返回已解析好的
+    }
+    function PrintOnPage(callback){
+        $("#result-box").html("");
+        $.each(callback,function(index,item){
+            var row_html = "<p>" + item.bind_host__host__hostname + "(" + item.bind_host__host__ip_addr + ") ---->" + item.bind_host__host_user__username + " ----" +item.date +  "-----" + item.result + "</p>" +
+                            "<pre>" + item.event_log + "</pre>"
+            $("#result-box").append(row_html);
+
+        })//end each
+    }
+
+    </script>

@@ -1,0 +1,65 @@
+{% extends 'hosts/dashboard.html' %}
+
+{% block content-panel %}
+
+    <div class="col-md-3">
+        主机组
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div id="host-group" class="list-group">
+            <!-- bind_hosts单独定义超级管理员可以管理的主机，没有加入组，request.user.bind_hosts.select_related.count返回个数-->
+              <a class="list-group-item active" href="{% url 'host_mgr' %}">未分组主机 [ {{ request.user.bind_hosts.select_related.count }} ]</a>
+               <!-- ?selected_gid把id传到views.py下。group.name显示组的名字和反选对应的数量-->
+              {%  for group in request.user.host_groups.select_related %}
+                 <a class="list-group-item"  href="{% url 'host_mgr' %}?selected_gid={{ group.id }}">{{ group.name }} [ {{ group.bindhosttouser_set.select_related.count }} ]</a>
+              {% endfor %}
+          </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        主机列表
+        <div class="panel panel-default">
+          <div class="panel-body">
+
+            <table class="table table-bordered table-hover">
+              <tr>
+                  <th>#</th>
+                  <th>Hostname</th>
+                  <th>IP</th>
+                  <th>System type</th>
+                  <th>IDC</th>
+                  <th>Port</th>
+                  <th>Host user</th>
+                  <th>Status</th>
+                  <th>Login</th>
+
+              </tr>
+               {% for h in host_list %}
+                     <!-- 对应views.py下-->
+              <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ h.host.hostname }}</td>
+                  <td>{{ h.host.ip_addr }}</td>
+                  <td>{{ h.host.system_type }}</td>
+                  <td>{{ h.host.idc }}</td>
+                  <td>{{ h.host.port }}</td>
+                  <td>{{ h.host_user.username }}</td>
+                  <td>{{ h.host.enabled }}</td>
+                  <td>Login</td>
+              </tr>
+
+             {% endfor %}
+            </table>
+
+
+
+
+
+          </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
